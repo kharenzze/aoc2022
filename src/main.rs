@@ -1,8 +1,7 @@
 mod one;
+mod three;
 mod two;
 
-use crate::one::one;
-use crate::two::two;
 use std::env;
 fn main() {
   let args: Vec<String> = env::args().collect();
@@ -13,8 +12,9 @@ fn main() {
   let day: &str = args.get(1).unwrap();
 
   match day {
-    "1" => one(),
-    "2" => two(),
+    "1" => crate::one::one(),
+    "2" => crate::two::two(),
+    "3" => crate::three::three(),
     _ => unreachable!(),
   }
 }
