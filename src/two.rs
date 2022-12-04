@@ -1,34 +1,66 @@
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
-fn read_data() -> Vec<Vec<usize>> {
-  let filename = format!("./resources/1.txt");
+enum Choice {
+  Rock,
+  Paper,
+  Scissor,
+}
+
+enum Strategy {
+  X,
+  Y,
+  Z,
+}
+
+impl From<&str> for Choice {
+  fn from(i: &str) -> Self {
+    match i {
+      "A" => Choice::Rock,
+      "B" => Choice::Paper,
+      "C" => Choice::Scissor,
+      _ => unreachable!(),
+    }
+  }
+}
+
+impl From<&str> for Strategy {
+  fn from(i: &str) -> Self {
+    match i {
+      "X" => Strategy::X,
+      "Y" => Strategy::Y,
+      "Z" => Strategy::Z,
+      _ => unreachable!(),
+    }
+  }
+}
+
+struct Move(Choice, Strategy);
+
+impl Move {
+  fn from_line(l: &str) -> Self {
+    let chars: Vec<&str> = l.split(" ").collect();
+    let choice = Choice::from(chars[0]);
+    let strategy = Strategy::from(chars[1]);
+    Move(choice, strategy)
+  }
+}
+
+fn read_data() -> Vec<Move> {
+  let filename = format!("./resources/2.txt");
   let file: File = File::open(&filename).expect(&format!("Cannot open file {}", &filename));
   let reader = BufReader::new(file);
   let mut line_iter = reader.lines();
-  let mut lists: Vec<Vec<usize>> = vec![];
-  let mut current: Vec<usize> = vec![];
-
-  while let Some(Ok(line)) = line_iter.next() {
-    if line.len() == 0 {
-      lists.push(current);
-      current = vec![];
-      continue;
-    }
-    let value: usize = line.parse().unwrap();
-    current.push(value);
-  }
-  if current.len() != 0 {
-    lists.push(current);
-  }
-  lists
+  line_iter
+    .map(|l| l.unwrap())
+    .map(|l| Move::from_line(&l))
+    .collect()
 }
 
-pub fn one() {
-  let lists = read_data();
-  let mut summaries: Vec<usize> = lists.iter().map(|list| list.iter().sum()).collect();
-  summaries.sort();
-  summaries.reverse();
-  let max: usize = summaries.iter().take(3).sum();
-  println!("{max}");
+fn eval(game: Vec<Move>, truthy: bool) -> usize {
+  0
+}
+
+pub fn two() {
+  let game = read_data();
 }
