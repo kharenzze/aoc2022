@@ -27,6 +27,27 @@ impl From<&str> for Choice {
   }
 }
 
+impl From<usize> for Choice {
+  fn from(i: usize) -> Self {
+    match i % 3 {
+      0 => Choice::Rock,
+      1 => Choice::Paper,
+      2 => Choice::Scissor,
+      _ => unreachable!(),
+    }
+  }
+}
+
+impl Into<usize> for Choice {
+  fn into(self) -> usize {
+    match self {
+      Choice::Rock => 0,
+      Choice::Paper => 1,
+      Choice::Scissor => 2,
+    }
+  }
+}
+
 impl From<&str> for Strategy {
   fn from(i: &str) -> Self {
     match i {
@@ -48,11 +69,27 @@ impl PlannedMove {
     let strategy = Strategy::from(chars[1]);
     Self(choice, strategy)
   }
+
   fn into_move(&self) -> Move {
     let my_choice = match self.1 {
       Strategy::X => Choice::Rock,
       Strategy::Y => Choice::Paper,
       Strategy::Z => Choice::Scissor,
+    };
+    Move(self.0, my_choice)
+  }
+
+  fn into_move_extra(&self) -> Move {
+    let my_choice = match self.1 {
+      Strategy::X => {
+        let x: usize = self.0.into();
+        Choice::from(x + 2)
+      }
+      Strategy::Y => self.0.clone(),
+      Strategy::Z => {
+        let x: usize = self.0.into();
+        Choice::from(x + 1)
+      }
     };
     Move(self.0, my_choice)
   }
@@ -99,7 +136,7 @@ fn read_data() -> Vec<PlannedMove> {
   let filename = format!("./resources/2.txt");
   let file: File = File::open(&filename).expect(&format!("Cannot open file {}", &filename));
   let reader = BufReader::new(file);
-  let mut line_iter = reader.lines();
+  let line_iter = reader.lines();
   line_iter
     .map(|l| l.unwrap())
     .map(|l| PlannedMove::from_line(&l))
@@ -107,7 +144,11 @@ fn read_data() -> Vec<PlannedMove> {
 }
 
 fn eval(game: &Vec<PlannedMove>) -> usize {
-  game.iter().map(|m| m.into_move()).map(|m| m.score()).sum()
+  game
+    .iter()
+    .map(|m| m.into_move_extra())
+    .map(|m| m.score())
+    .sum()
 }
 
 pub fn two() {
