@@ -34,9 +34,36 @@ fn find_item(line: &String) -> char {
   unreachable!()
 }
 
-pub fn three() {
+fn part_one() {
   let input = read_data();
   let score: usize = input.iter().map(find_item).map(char_to_priority).sum();
+  println!("{score}");
+}
+
+pub fn three() {
+  let input = read_data();
+  let chunks = input.chunks_exact(3);
+  let score: usize = chunks
+    .map(|c| {
+      let union_set: Option<HashSet<_>> = c
+        .iter()
+        .map(|line| {
+          let set: HashSet<char> = line.chars().collect();
+          set
+        })
+        .fold(None, |acc, set| {
+          if acc.is_none() {
+            return Some(set.clone());
+          }
+          let prev = acc.unwrap();
+          let intersection: HashSet<char> = prev.intersection(&set).map(|r| r.to_owned()).collect();
+          return Some(intersection);
+        });
+      let as_vec: Vec<_> = union_set.unwrap().into_iter().collect();
+      let common_char = as_vec.first().unwrap().to_owned();
+      char_to_priority(common_char)
+    })
+    .sum();
   println!("{score}");
 }
 
