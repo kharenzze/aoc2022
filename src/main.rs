@@ -1,3 +1,4 @@
+mod five;
 mod one;
 mod three;
 mod two;
@@ -15,6 +16,7 @@ fn main() {
     "1" => crate::one::one(),
     "2" => crate::two::two(),
     "3" => crate::three::three(),
+    "5" => crate::five::five(),
     _ => unreachable!(),
   }
 }
