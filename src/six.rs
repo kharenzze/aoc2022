@@ -13,21 +13,22 @@ fn read_data() -> String {
 
 pub fn six() {
   let input = read_data();
-  let score = detect_marker(&input);
+  let score = detect_marker(&input, CHUNK_SIZE_V2);
   println!("{score}")
 }
 
 const CHUNK_SIZE: usize = 4;
+const CHUNK_SIZE_V2: usize = 14;
 
-fn detect_marker(input: &str) -> usize {
+fn detect_marker(input: &str, chunk_size: usize) -> usize {
   let mut start: usize = 0;
   let mut found: Option<usize> = None;
 
   while found.is_none() {
-    let end = start + CHUNK_SIZE - 1;
+    let end = start + chunk_size - 1;
     let chunk = &input[start..=end];
     let set: HashSet<char> = HashSet::from_iter(chunk.chars());
-    if set.len() == CHUNK_SIZE {
+    if set.len() == chunk_size {
       found = Some(end);
     } else {
       start += 1;
@@ -40,6 +41,7 @@ fn detect_marker(input: &str) -> usize {
 #[cfg(test)]
 mod tests {
   use super::detect_marker;
+  use crate::six::{CHUNK_SIZE, CHUNK_SIZE_V2};
 
   #[test]
   fn detection() {
@@ -51,8 +53,10 @@ mod tests {
       "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw",
     ];
     let expected = vec![7, 5, 6, 10, 11];
+    let expected_v2 = vec![19, 23, 23, 29, 26];
     for (i, input) in inputs.iter().enumerate() {
-      assert_eq!(detect_marker(*input), expected[i]);
+      assert_eq!(detect_marker(*input, CHUNK_SIZE), expected[i]);
+      assert_eq!(detect_marker(*input, CHUNK_SIZE_V2), expected_v2[i]);
     }
   }
 }
