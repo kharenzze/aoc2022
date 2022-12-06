@@ -1,8 +1,10 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
+use std::iter::FromIterator;
 
 fn read_data() -> String {
-  let filename = format!("./resources/5.txt");
+  let filename = format!("./resources/6.txt");
   let file: File = File::open(&filename).expect(&format!("Cannot open file {}", &filename));
   let reader = BufReader::new(file);
   let mut line_iter = reader.lines();
@@ -11,10 +13,28 @@ fn read_data() -> String {
 
 pub fn six() {
   let input = read_data();
+  let score = detect_marker(&input);
+  println!("{score}")
 }
 
+const CHUNK_SIZE: usize = 4;
+
 fn detect_marker(input: &str) -> usize {
-  unimplemented!()
+  let mut start: usize = 0;
+  let mut found: Option<usize> = None;
+
+  while found.is_none() {
+    let end = start + CHUNK_SIZE - 1;
+    let chunk = &input[start..=end];
+    let set: HashSet<char> = HashSet::from_iter(chunk.chars());
+    if set.len() == CHUNK_SIZE {
+      found = Some(end);
+    } else {
+      start += 1;
+    }
+  }
+
+  found.unwrap() + 1
 }
 
 #[cfg(test)]
