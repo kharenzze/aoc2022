@@ -1,21 +1,10 @@
+use crate::point::Point;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
 type Input = Vec<Vec<usize>>;
 const RADIX: u32 = 10;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Hash)]
-struct Point {
-  x: usize,
-  y: usize,
-}
-
-impl Point {
-  fn new(x: usize, y: usize) -> Self {
-    Self { x, y }
-  }
-}
 
 fn char_to_usize(c: char) -> usize {
   c.to_digit(RADIX).unwrap() as usize
