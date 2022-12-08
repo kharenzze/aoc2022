@@ -1,6 +1,7 @@
 use std::fmt::{Display, Formatter};
 use std::ops::Add;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Direction {
   Up,
   Right,
