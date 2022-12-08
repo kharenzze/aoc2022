@@ -2,6 +2,7 @@ mod eight;
 mod five;
 mod one;
 mod point;
+mod seven;
 mod six;
 mod three;
 mod two;
