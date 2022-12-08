@@ -161,7 +161,8 @@ mod tests {
   #[test]
   fn get_points_around() {
     let points = ZERO.get_points_around();
-    assert_eq!(points.len(), 2);
+    assert_eq!(points.len(), 4);
+    assert_eq!(points.iter().filter(|o| o.is_none()).count(), 2);
     assert_eq!(points.iter().find(|v| v.eq(&&Some(X))).is_some(), true);
     assert_eq!(points.iter().find(|v| v.eq(&&Some(Y))).is_some(), true);
   }
