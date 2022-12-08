@@ -1,6 +1,13 @@
 use std::fmt::{Display, Formatter};
 use std::ops::Add;
 
+enum Direction {
+  Up,
+  Right,
+  Down,
+  Left,
+}
+
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point {
   pub x: usize,
@@ -70,6 +77,29 @@ impl Point {
     let x = usize_diff(self.x, p.x);
     let y = usize_diff(self.y, p.y);
     Point::new(x, y).squared_norm()
+  }
+
+  pub fn get_next(&self, d: Direction, container: &Point) -> Option<Point> {
+    match d {
+      Direction::Up => self.checked_sub(&X),
+      Direction::Right => {
+        let n = *self + Y;
+        if container.contains(&n) {
+          Some(n)
+        } else {
+          None
+        }
+      }
+      Direction::Down => {
+        let n = *self + X;
+        if container.contains(&n) {
+          Some(n)
+        } else {
+          None
+        }
+      }
+      Direction::Left => self.checked_sub(&Y),
+    }
   }
 }
 
