@@ -22,6 +22,7 @@ fn main() {
     "3" => crate::three::three(),
     "5" => crate::five::five(),
     "6" => crate::six::six(),
+    "7" => crate::seven::seven(),
     "8" => crate::eight::eight(),
     _ => unreachable!(),
   }
