@@ -1,12 +1,19 @@
 use std::fmt::{Display, Formatter};
 use std::ops::Add;
 
-enum Direction {
+pub enum Direction {
   Up,
   Right,
   Down,
   Left,
 }
+
+pub const DIRECTIONS: &'static [Direction] = &[
+  Direction::Up,
+  Direction::Right,
+  Direction::Down,
+  Direction::Left,
+];
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point {
