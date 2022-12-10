@@ -44,12 +44,24 @@ fn is_point_of_interest(c: isize) -> bool {
   v >= 0 && v % 40 == 0
 }
 
+fn sprite_overlap(x: isize, pos: usize) -> bool {
+  let pos = pos as isize;
+  let prev = x - 1;
+  let next = x + 1;
+  pos >= prev && pos <= next
+}
+
+const SPRITE_W: usize = 40;
+
 fn solve(input: Input) -> isize {
   let mut cycle: isize = 1;
   let mut pending_cycles: usize = 0;
   let mut poi_list: Vec<isize> = vec![];
   let mut x: isize = 1;
   let mut current_op: Option<&Operation> = Some(&Operation::Noop);
+  let mut sprite_counter: usize = 0;
+  let mut sprite: Vec<String> = vec![];
+  let mut sprite_line: Vec<char> = vec![];
   let operations: Vec<Operation> = input.iter().map(Operation::from_line).collect();
   let mut operations_iter = operations.iter();
   loop {
@@ -62,6 +74,20 @@ fn solve(input: Input) -> isize {
 
       //charge next
       current_op = operations_iter.next();
+    }
+
+    if sprite_overlap(x, sprite_counter) {
+      sprite_line.push('#')
+    } else {
+      sprite_line.push('.')
+    }
+    sprite_counter += 1;
+
+    if sprite_counter == SPRITE_W {
+      let line: String = sprite_line.iter().collect();
+      sprite_counter = 0;
+      sprite_line = vec![];
+      sprite.push(line);
     }
 
     //compute points of interest
@@ -79,6 +105,10 @@ fn solve(input: Input) -> isize {
 
     pending_cycles -= 1;
     cycle += 1;
+  }
+
+  for line in sprite {
+    println!("{line}");
   }
 
   poi_list.iter().sum()
