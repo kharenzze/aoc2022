@@ -54,7 +54,7 @@ pub fn five() {
     let end = from.len();
     let start = end - m.count;
     let mut dropped: Vec<char> = from.drain(start..end).collect();
-    dropped.reverse();
+    //dropped.reverse();
     let to: &mut Vec<_> = data.get_mut(m.to).unwrap();
     to.append(&mut dropped);
   }
