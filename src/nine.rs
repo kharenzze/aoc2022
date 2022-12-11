@@ -84,10 +84,6 @@ impl Point {
     in_range(diff_x, -1, 1) && in_range(diff_y, -1, 1)
   }
 
-  fn is_same_line(&self, other: &Point) -> bool {
-    self.x == other.x || self.y == other.y
-  }
-
   fn move_to(&mut self, d: Direction) {
     match d {
       Direction::Up => *self = *self + X,
@@ -102,23 +98,34 @@ const X: Point = Point::new(1, 0);
 const Y: Point = Point::new(0, 1);
 const ZERO: Point = Point::new(0, 0);
 
+const SNAKE_LEN: usize = 10;
+const LAST: usize = SNAKE_LEN - 1;
+
 fn solve(input: Input) -> usize {
-  let mut head = ZERO;
-  let mut tail = ZERO;
+  let snake = &mut [ZERO; SNAKE_LEN];
   let mut visited: HashSet<Point> = Default::default();
-  visited.insert(tail);
+  visited.insert(ZERO);
   let iter = input.iter().map(Instruction::from_line);
   for instruction in iter {
     for _ in 0..instruction.count {
-      head.move_to(instruction.dir);
-      if head.is_adjacent(&tail) {
-        continue;
+      {
+        let head = &mut snake[0];
+        head.move_to(instruction.dir);
       }
-      let mut diff = head - tail;
-      diff.x = diff.x.clamp(-1, 1);
-      diff.y = diff.y.clamp(-1, 1);
-      tail = tail + diff;
-      visited.insert(tail);
+      for i in 1..SNAKE_LEN {
+        let head = snake[i - 1];
+        let tail = &mut snake[i];
+        if head.is_adjacent(tail) {
+          continue;
+        }
+        let mut diff = head - *tail;
+        diff.x = diff.x.clamp(-1, 1);
+        diff.y = diff.y.clamp(-1, 1);
+        *tail = *tail + diff;
+        if i == LAST {
+          visited.insert(*tail);
+        }
+      }
     }
   }
 
