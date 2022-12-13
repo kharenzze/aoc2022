@@ -1,4 +1,5 @@
 mod eight;
+mod eleven;
 mod five;
 mod nine;
 mod one;
@@ -28,6 +29,7 @@ fn main() {
     "8" => crate::eight::eight(),
     "9" => crate::nine::nine(),
     "10" => crate::ten::ten(),
+    "11" => crate::eleven::eleven(),
     _ => unreachable!(),
   }
 }
