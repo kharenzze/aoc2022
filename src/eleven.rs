@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::default;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
@@ -23,6 +24,13 @@ impl OpValue {
     match s {
       "old" => OpValue::Old,
       x => OpValue::Number(x.parse().unwrap()),
+    }
+  }
+
+  fn to_value(&self, old: isize) -> isize {
+    match self {
+      Self::Old => old,
+      Self::Number(n) => *n,
     }
   }
 }
@@ -62,6 +70,17 @@ struct Operation {
   operator: Operator,
 }
 
+impl Operation {
+  fn exec(&self, val: isize) -> isize {
+    let a = self.a.to_value(val);
+    let b = self.b.to_value(val);
+    match self.operator {
+      Operator::Sum => a + b,
+      Operator::Mult => a * b,
+    }
+  }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 struct MonkeyTest {
   test_value: isize,
@@ -83,6 +102,7 @@ impl MonkeyTest {
 struct Monkey {
   id: usize,
   items: Vec<isize>,
+  inspected_items: usize,
   operation: Operation,
   test: MonkeyTest,
 }
@@ -154,11 +174,47 @@ impl Monkey {
   }
 }
 
+const ITERATIONS: usize = 20;
+
 fn solve(input: Input) -> usize {
-  let filtered: Input = input.into_iter().filter(|s| s.is_empty()).collect();
+  let filtered: Input = input.into_iter().filter(|s| !s.is_empty()).collect();
   let grouped: Vec<Input> = filtered.chunks(6).map(|c| c.to_owned()).collect();
-  let monkeys: Vec<Monkey> = grouped.into_iter().map(Monkey::from_lines).collect();
-  1
+  let monkeys: Vec<RefCell<Monkey>> = grouped
+    .into_iter()
+    .map(Monkey::from_lines)
+    .map(|m| RefCell::new(m))
+    .collect();
+  for _ in 0..ITERATIONS {
+    for monkey_ref in monkeys.iter() {
+      {
+        let m = monkey_ref.borrow();
+        for &item in m.items.iter() {
+          let next_worry_level = m.operation.exec(item) / 3;
+          let target = m.test.test(next_worry_level);
+          let mut target = monkeys[target].borrow_mut();
+          target.items.push(next_worry_level);
+        }
+      }
+      let mut m = monkey_ref.borrow_mut();
+      let inspected = m.items.len();
+      m.items = vec![];
+      m.inspected_items += inspected;
+    }
+  }
+
+  let mut monkeys: Vec<usize> = monkeys
+    .into_iter()
+    .map(|m| m.into_inner())
+    .map(|m| m.inspected_items)
+    .collect();
+
+    for m in monkeys.iter() {
+
+    }
+  
+  monkeys.sort();
+  let score: usize = monkeys.iter().rev().take(2).fold(1, |acc, v| acc * *v);
+  score
 }
 
 pub fn eleven() {
@@ -169,9 +225,46 @@ pub fn eleven() {
 
 #[cfg(test)]
 mod tests {
+  use super::solve;
 
   #[test]
   fn simple() {
-    assert!(true)
+    let input: Vec<String> = SAMPLE
+      .lines()
+      .map(|r| r.to_owned())
+      .filter(|s| !s.is_empty())
+      .collect();
+    println!("{input:?}");
+    let score = solve(input);
+    assert_eq!(score, 10605);
   }
+
+  const SAMPLE: &'static str = r#"
+Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
+
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1"#;
 }
