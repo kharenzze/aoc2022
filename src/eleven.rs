@@ -174,7 +174,7 @@ impl Monkey {
   }
 }
 
-const ITERATIONS: usize = 20;
+const ITERATIONS: usize = 10000;
 
 fn solve(input: Input) -> usize {
   let filtered: Input = input.into_iter().filter(|s| !s.is_empty()).collect();
@@ -184,15 +184,19 @@ fn solve(input: Input) -> usize {
     .map(Monkey::from_lines)
     .map(|m| RefCell::new(m))
     .collect();
+  let common_multiplier = monkeys
+    .iter()
+    .map(|m| m.borrow().test.test_value)
+    .fold(1, |acc, x| acc * x);
   for _ in 0..ITERATIONS {
     for monkey_ref in monkeys.iter() {
       {
         let m = monkey_ref.borrow();
         for &item in m.items.iter() {
-          let next_worry_level = m.operation.exec(item) / 3;
+          let next_worry_level = m.operation.exec(item);
           let target = m.test.test(next_worry_level);
           let mut target = monkeys[target].borrow_mut();
-          target.items.push(next_worry_level);
+          target.items.push(next_worry_level % common_multiplier);
         }
       }
       let mut m = monkey_ref.borrow_mut();
@@ -208,10 +212,6 @@ fn solve(input: Input) -> usize {
     .map(|m| m.inspected_items)
     .collect();
 
-    for m in monkeys.iter() {
-
-    }
-  
   monkeys.sort();
   let score: usize = monkeys.iter().rev().take(2).fold(1, |acc, v| acc * *v);
   score
@@ -236,7 +236,7 @@ mod tests {
       .collect();
     println!("{input:?}");
     let score = solve(input);
-    assert_eq!(score, 10605);
+    assert_eq!(score, 2713310158);
   }
 
   const SAMPLE: &'static str = r#"
