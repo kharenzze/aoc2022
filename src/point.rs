@@ -71,6 +71,22 @@ impl Point {
     ]
   }
 
+  pub fn get_points_around_inside_container(&self, dims: &Self) -> Vec<Point> {
+    self
+      .get_points_around()
+      .iter()
+      .filter(|o| o.is_some())
+      .filter_map(|o| {
+        let p = o.unwrap();
+        if dims.contains(&p) {
+          Some(p)
+        } else {
+          None
+        }
+      })
+      .collect()
+  }
+
   pub fn checked_sub(&self, rhs: &Point) -> Option<Point> {
     let x = self.x.checked_sub(rhs.x)?;
     let y = self.y.checked_sub(rhs.y)?;
