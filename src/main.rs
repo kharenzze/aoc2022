@@ -1,14 +1,15 @@
 mod eight;
 mod eleven;
 mod five;
+mod four;
 mod nine;
 mod one;
-mod twelve;
 mod point;
 mod seven;
 mod six;
 mod ten;
 mod three;
+mod twelve;
 mod two;
 
 use std::env;
@@ -24,6 +25,7 @@ fn main() {
     "1" => crate::one::one(),
     "2" => crate::two::two(),
     "3" => crate::three::three(),
+    "4" => crate::four::four(),
     "5" => crate::five::five(),
     "6" => crate::six::six(),
     "7" => crate::seven::seven(),
