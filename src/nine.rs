@@ -154,6 +154,6 @@ R 2
 "#;
     let input: Vec<String> = input_string.lines().map(|l| l.to_owned()).collect();
     let score = super::solve(input);
-    assert_eq!(score, 13);
+    assert_eq!(score, 1);
   }
 }
