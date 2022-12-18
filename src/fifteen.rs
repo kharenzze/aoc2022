@@ -89,6 +89,21 @@ impl Range {
       None
     }
   }
+
+  fn into_iter(self) -> impl Iterator<Item = isize> {
+    self.min..=self.max
+  }
+
+  fn intersection(&self, bound: Self) -> Option<Self> {
+    if self.overlaps(&bound) {
+      Some(Self {
+        min: self.min.max(bound.min),
+        max: self.max.min(bound.max),
+      })
+    } else {
+      None
+    }
+  }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -173,10 +188,66 @@ fn solve(input: Input, line: isize) -> usize {
   blocked_cells - used_by_sensors
 }
 
+fn solve_v2(input: Input, valid_range: Range) -> usize {
+  const TUNING_FREC_MULT: isize = 4000000;
+  let sensors: Vec<Sensor> = input.iter().map(|s| Sensor::from_str(s)).collect();
+
+  let mut position = Point::default();
+
+  for line in valid_range.into_iter() {
+    let mut blocked_ranges: Vec<Range> = sensors
+      .iter()
+      .filter_map(|s| {
+        let calculated = s.blocked_cells_in_line(line);
+        if let Some(r) = calculated {
+          r.intersection(valid_range)
+        } else {
+          None
+        }
+      })
+      .collect();
+    blocked_ranges.sort_by_key(|r| r.min);
+    let mut simplified_ranges: Vec<Range> =
+      blocked_ranges.into_iter().fold(vec![], |mut acc, r| {
+        if let Some(last) = acc.last_mut() {
+          if let Some(merged) = last.merge(&r) {
+            *last = merged;
+            return acc;
+          }
+        }
+        acc.push(r);
+        acc
+      });
+    if simplified_ranges.len() == 1 {
+      let r = simplified_ranges[0];
+      if r.len() == valid_range.len() {
+        continue;
+      } else {
+        let x = if r.contains(valid_range.min) {
+          r.min
+        } else {
+          r.max
+        };
+        position = Point { x, y: line };
+        break;
+      }
+    } else {
+      let r = simplified_ranges[0];
+      let x = r.max + 1;
+      position = Point { x, y: line };
+      break;
+    }
+  }
+
+  (position.x * TUNING_FREC_MULT + position.y) as usize
+}
+
 pub fn fifteen() {
   let input = read_data();
   const LINE: isize = 2000000;
-  let score = solve(input, LINE);
+  // let score = solve(input, LINE);
+  const MAX: isize = 4000000;
+  let score = solve_v2(input, Range::new(0, MAX));
   println!("{score}")
 }
 
@@ -213,6 +284,13 @@ mod tests {
     let input = SAMPLE.lines().map(|s| s.to_string()).collect();
     let score = super::solve(input, 10);
     assert_eq!(score, 26);
+  }
+
+  #[test]
+  fn solve_v2() {
+    let input = SAMPLE.lines().map(|s| s.to_string()).collect();
+    let score = super::solve_v2(input, Range::new(0, 20));
+    assert_eq!(score, 56000011);
   }
 
   #[test]
