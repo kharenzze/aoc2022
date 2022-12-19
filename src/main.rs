@@ -9,6 +9,7 @@ mod point;
 mod seven;
 mod six;
 mod ten;
+mod thirteen;
 mod three;
 mod twelve;
 mod two;
@@ -35,6 +36,7 @@ fn main() {
     "10" => crate::ten::ten(),
     "11" => crate::eleven::eleven(),
     "12" => crate::twelve::twelve(),
+    "13" => crate::thirteen::thirteen(),
     "15" => crate::fifteen::fifteen(),
     _ => unreachable!(),
   }
